@@ -1,8 +1,14 @@
 package commands
 
-func IsCustomCommand(command string) bool {
-	switch command {
-	case "ls", "pwd":
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+
+func IsCustomCommand(command []string) bool {
+	switch command[1] {
+	case "explore":
 		return true
 	}
 
@@ -10,10 +16,23 @@ func IsCustomCommand(command string) bool {
 }
 
 func ExecuteCustomCommand(command string) {
-	switch command {
-	case "ls":
-		Execute("ls")
-	case "pwd":
-		Execute("pwd")
+	splitCommand := strings.Split(command, " ")
+
+	switch splitCommand[0] {
+	case "explore":
+		ExploreRepo(splitCommand[1])
 	}
+}
+
+func ExploreRepo(resourceUrl string) {
+	if resourceUrl == "" {
+		fmt.Println("Please provide a git URL to explore")
+		os.Exit(1)
+	}
+
+	tempDir := "/tmp/2g"
+	Execute("mkdir " + tempDir)
+	Execute("git clone " + resourceUrl + " " + tempDir)
+	Execute("yazi " + tempDir)
+	Execute("rm -rf " + tempDir)
 }

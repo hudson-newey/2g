@@ -8,14 +8,13 @@ import (
 )
 
 func main() {
-	// remove the first argument which is the program name and join the rest
-	args := strings.Join(os.Args[1:], "")
-	gitCommand := "git " + args
+	args := strings.Join(os.Args[1:], " ")
 
-	if commands.IsCustomCommand(args) {
+	if commands.IsCustomCommand(os.Args) {
 		commands.ExecuteCustomCommand(args)
 		return
 	}
 
+	gitCommand := "git " + args
 	commands.Execute(gitCommand)
 }
