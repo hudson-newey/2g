@@ -41,6 +41,10 @@ that were installed.
 clone command, using \f[V]clone-file\f[R] allows you to clone a single
 file from a git repository.
 Without any Git history attached.
+.IP \[bu] 2
+\f[V]2g cache-clone <repo.git>\f[R] A more optimized version of
+\f[V]git clone\f[R] that will attempt to use a local cache of the
+repository and update it instead of cloning an entire repo from scratch.
 .SS Patched Commands
 .IP \[bu] 2
 \f[V]2g clone <repo.git>/[file_path]\f[R] By adding a file path to a

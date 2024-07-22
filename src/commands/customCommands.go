@@ -8,7 +8,7 @@ import (
 
 func IsCustomCommand(command []string) bool {
 	switch command[1] {
-	case "explore", "install", "clone-file":
+	case "explore", "install", "clone-file", "cache-clone":
 		return true
 	}
 
@@ -37,7 +37,53 @@ func ExecuteCustomCommand(command string) {
 		CloneSingle(commandParam[1])
 	case "clone-file":
 		CloneSingle(commandParam[1])
+	case "cache-clone":
+		CacheCloneRepo(commandParam[1])
+	default:
+		invalidCommand(commandParam[0])
 	}
+}
+
+// an optimized version of the clone command that will clone the repo to
+// ~/.local/share/2g/cache and then copy the cloned repo to the current
+// directory.
+// any future attempts to clone the repo will attempt to update the cached
+// repository instead of cloning the whole repository again.
+//
+// TODO: I hope to make this the default clone patch, but I don't have 100%
+// confidence in it
+func CacheCloneRepo(resourceUrl string) {
+	if resourceUrl == "" {
+		fmt.Println("Please provide a git URL to clone")
+		os.Exit(1)
+	}
+
+	repoName := strings.Split(resourceUrl, "/")
+	cacheLocation := expandPath("~/.local/share/2g/cache/" + repoName[len(repoName)-1] + "/")
+
+	setupCommand := "mkdir -p ~/.local/share/2g/cache"
+	Execute(setupCommand)
+
+	// see if we have a cached version of the repository available
+	_, err := os.Stat(cacheLocation)
+	if err != nil {
+		// we had a cache miss and we should clone the repository
+		// to the cache location
+		fmt.Println("Cache miss! Cloning", resourceUrl)
+		cloneCommand := "git clone " + resourceUrl + " " + cacheLocation
+		Execute(cloneCommand)
+	} else {
+		// there was a cache hit! we should attempt to update the cache through
+		// a git pull
+		fmt.Println("Cache hit! Updating", resourceUrl)
+		updateCommand := "git -C " + cacheLocation + " pull --rebase"
+		Execute(updateCommand)
+	}
+
+	copyCommand := "cp -r " + cacheLocation + " ."
+	Execute(copyCommand)
+
+	fmt.Println("Cloned", resourceUrl)
 }
 
 // this is a patch for the clone command that allows you to clone a single file
@@ -97,4 +143,15 @@ func InstallRepo(resourceUrl string) {
 	}
 
 	ExecuteCommands(commandsToRun)
+}
+
+func invalidCommand(command string) {
+	fmt.Println("Invalid command", command)
+	os.Exit(1)
+}
+
+func expandPath(path string) string {
+	homePath := os.Getenv("HOME")
+	result := strings.ReplaceAll(path, "~", homePath)
+	return result
 }

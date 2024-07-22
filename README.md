@@ -23,6 +23,11 @@ Git should have full functionality (including using vim to edit commit message).
     Similar to the patched clone command, using `clone-file` allows you to clone
     a single file from a git repository. Without any Git history attached.
 
+- `2g cache-clone <repo.git>`
+    A more optimized version of `git clone` that will attempt to use a local
+    cache of the repository and update it instead of cloning an entire repo
+    from scratch.
+
 ## Patched Commands
 
 - `2g clone <repo.git>/[file_path]`
