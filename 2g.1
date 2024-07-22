@@ -28,11 +28,26 @@ Git should have full functionality (including using vim to edit commit
 message).
 .SS Custom Commands
 .IP \[bu] 2
-\f[V]2g explore <url>\f[R] Allows you to explore a Git repo without
+\f[V]2g explore <repo.git>\f[R] Allows you to explore a Git repo without
 polluting your directories.
 .IP \[bu] 2
-\f[V]2g install <url>\f[R] Clones a repository in
+\f[V]2g install <repo.git>\f[R] Clones a repository in
 \f[V]\[ti]/.local/bin\f[R] and adds the repository to your
 \f[V]PATH\f[R] environment variable.
 Note: You will have to reload your shell to use any programs/scripts
 that were installed.
+.IP \[bu] 2
+\f[V]2g clone-file <repo.git>/<file_path>\f[R] Similar to the patched
+clone command, using \f[V]clone-file\f[R] allows you to clone a single
+file from a git repository.
+Without any Git history attached.
+.SS Patched Commands
+.IP \[bu] 2
+\f[V]2g clone <repo.git>/[file_path]\f[R] By adding a file path to a
+clone command, you are able to clone a single file from a git
+repository.
+Warning: This file will not have any Git history attached to it because
+it was not cloned as part of a repository.
+Example: Clone the CUDA .gitignore file into your repository you would
+run
+\f[V]2g clone https://github.com/github/gitignore/blob/main/CUDA.gitignore\f[R]

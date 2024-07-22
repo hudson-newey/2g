@@ -17,3 +17,9 @@ func Execute(command string) {
 		os.Exit(1)
 	}
 }
+
+func ExecuteCommands(commands []string) {
+	for _, command := range commands {
+		Execute(command)
+	}
+}
