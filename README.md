@@ -27,6 +27,9 @@ Git should have full functionality (including using vim to edit commit message).
     A more optimized version of `git clone` that will attempt to use a local
     cache of the repository and update it instead of cloning an entire repo
     from scratch.
+    Additionally, it will fetch git history in the background, meaning that you
+    will have access to all the repositories code, and (hopefully) by the time
+    that you push, all the git history will have been fetched.
 
 ## Patched Commands
 

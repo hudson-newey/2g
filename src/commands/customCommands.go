@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/hudson-newey/2g/shared/config"
 )
 
 func IsCustomCommand(command []string) bool {
@@ -59,9 +61,13 @@ func CacheCloneRepo(resourceUrl string) {
 	}
 
 	repoName := strings.Split(resourceUrl, "/")
-	cacheLocation := expandPath("~/.local/share/2g/cache/" + repoName[len(repoName)-1] + "/")
+	topLevelCacheLocation := config.CacheLocation()
+	cacheLocation := expandPath(topLevelCacheLocation + "/" + repoName[len(repoName)-1] + "/")
 
-	setupCommand := "mkdir -p ~/.local/share/2g/cache"
+	currentPath := os.Getenv("PWD")
+	localPath := currentPath + "/" + repoName[len(repoName)-1]
+
+	setupCommand := "mkdir -p " + topLevelCacheLocation
 	Execute(setupCommand)
 
 	// see if we have a cached version of the repository available
@@ -69,9 +75,21 @@ func CacheCloneRepo(resourceUrl string) {
 	if err != nil {
 		// we had a cache miss and we should clone the repository
 		// to the cache location
+		//
+		// we do a shallow clone so that the user will get the code as quick
+		// as possible (you usually don't need the whole history of a repo to start developing)
+		// the git history will be fetched and progressively updated by the daemon in the
+		// background while the user is developing, and is hopefully available by the time
+		// the user wants to push their changes
 		fmt.Println("Cache miss! Cloning", resourceUrl)
-		cloneCommand := "git clone " + resourceUrl + " " + cacheLocation
+		cloneCommand := "git clone --depth 1 --single-branch --branch=main " + resourceUrl + " " + cacheLocation
 		Execute(cloneCommand)
+
+		// send a request to the daemon to fetch git history
+		// this will be done in the background so that the user can start
+		// developing as soon as possible
+		configLocation := config.ConfigLocation()
+		appendToFile(configLocation, "init-repo:"+cacheLocation+" "+localPath+"\n")
 	} else {
 		// there was a cache hit! we should attempt to update the cache through
 		// a git pull
@@ -80,7 +98,7 @@ func CacheCloneRepo(resourceUrl string) {
 		Execute(updateCommand)
 	}
 
-	copyCommand := "cp -r " + cacheLocation + " ."
+	copyCommand := "cp -r " + cacheLocation + " " + localPath
 	Execute(copyCommand)
 
 	fmt.Println("Cloned", resourceUrl)
@@ -119,7 +137,7 @@ func ExploreRepo(resourceUrl string) {
 
 	commandsToRun := []string{
 		"mkdir " + tempDir,
-		"git clone --depth 1 " + resourceUrl + " " + tempDir,
+		"git clone --depth 1 --single-branch --branch=main " + resourceUrl + " " + tempDir,
 		"yazi " + tempDir,
 		"rm -rf " + tempDir,
 	}
@@ -137,7 +155,7 @@ func InstallRepo(resourceUrl string) {
 	installLocation := "~/.local/bin/" + repoName[len(repoName)-1]
 
 	commandsToRun := []string{
-		"git clone " + resourceUrl + " " + installLocation,
+		"git clone --depth 1 --single-branch --branch=main" + resourceUrl + " " + installLocation,
 		"echo 'export PATH=$PATH:" + installLocation + "' >> ~/.bashrc",
 		"echo 'export PATH=$PATH:" + installLocation + "' >> ~/.zshrc",
 	}
@@ -154,4 +172,24 @@ func expandPath(path string) string {
 	homePath := os.Getenv("HOME")
 	result := strings.ReplaceAll(path, "~", homePath)
 	return result
+}
+
+func appendToFile(path string, contents string) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		file, err := os.Create(path)
+		if err != nil {
+			panic(err)
+		}
+		file.Close()
+	}
+
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	if _, err := file.WriteString(contents); err != nil {
+		panic(err)
+	}
 }

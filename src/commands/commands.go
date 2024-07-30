@@ -23,3 +23,10 @@ func ExecuteCommands(commands []string) {
 		Execute(command)
 	}
 }
+
+func ExecuteCommandsInDir(commands []string, dir string) {
+	for _, command := range commands {
+		virtualCommand := fmt.Sprintf("cd %s && %s", dir, command)
+		Execute(virtualCommand)
+	}
+}
