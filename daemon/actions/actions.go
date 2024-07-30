@@ -50,11 +50,11 @@ func initRepo(command string) {
 
 		// replace the local .git with the fully fetched .git directory
 		// TODO: this should probably use a rebase instead
-		"rm -rf " + localPath + ".git",
-		"cp -r " + cachePath + "/.git/ " + localPath + ".git",
+		"rm -rf " + localPath + "/.git",
+		"cp -r " + cachePath + "/.git/ " + localPath + "/.git",
 	}
 
-	commands.ExecuteCommandsInDir(commandsToRun, localPath)
+	commands.ExecuteCommandsInDir(commandsToRun, cachePath)
 }
 
 func readFile(path string) []string {
