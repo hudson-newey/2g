@@ -1,6 +1,6 @@
 OUT_DIR=build
 
-.PHONY: clean
+.PHONY: clean build
 .PHONY: docs
 
 build:
