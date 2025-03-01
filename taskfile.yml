@@ -1,19 +1,34 @@
-version: '3'
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
 
 vars:
   OUT_DIR: "build"
+  DOC_INPUT: "README.md"
 
 tasks:
   build:
+    desc: Builds 2g for all target systems and generates documentation
+    cmds:
+      - pandoc --standalone --to man {{.DOC_INPUT}} -o ./{{.OUT_DIR}}/2g.1
+
+  build-program:
+    desc: Builds 2g for the current system
     cmds:
       - mkdir -p {{.OUT_DIR}}
       - go build -o {{.OUT_DIR}}/2g ./src/main.go
       - go build -o {{.OUT_DIR}}/2g-daemon ./daemon/main.go
 
-  clean:
+  install:
+    desc: Installs artifacts to the system (must be run as root)
     cmds:
-      - rm -rf {{.OUT_DIR}}
+      - scripts/install_artifacts.sh {{.OUT_DIR}}
 
   docs:
+    desc: Creates documentation for 2g
     cmds:
-      - pandoc --standalone --to man ./README.md -o ./2g.1
+      - pandoc --standalone --to man {{.DOC_INPUT}} -o ./{{.OUT_DIR}}/2g.1
+
+  clean:
+    desc: Removes all 2g build artifacts produced by build scripts
+    cmds:
+      - rm -rf {{.OUT_DIR}}
