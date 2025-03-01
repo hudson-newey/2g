@@ -9,6 +9,9 @@ tasks:
   build:
     desc: Builds 2g for all target systems and generates documentation
     cmds:
+      - mkdir -p {{.OUT_DIR}}
+      - go build -o {{.OUT_DIR}}/2g ./src/main.go
+      - go build -o {{.OUT_DIR}}/2g-daemon ./daemon/main.go
       - pandoc --standalone --to man {{.DOC_INPUT}} -o ./{{.OUT_DIR}}/2g.1
 
   build-program:

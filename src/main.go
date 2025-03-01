@@ -8,6 +8,11 @@ import (
 )
 
 func main() {
+	if len(os.Args) < 2 {
+		commands.Execute("git")
+		return
+	}
+
 	args := strings.Join(os.Args[1:], " ")
 
 	if commands.IsCustomCommand(os.Args) {

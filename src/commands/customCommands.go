@@ -28,21 +28,21 @@ func IsCustomCommand(command []string) bool {
 }
 
 func ExecuteCustomCommand(command string) {
-	commandParam := strings.Split(command, " ")
+	commandParams := strings.Split(command, " ")
 
-	switch commandParam[0] {
+	switch commandParams[0] {
 	case "explore":
-		ExploreRepo(commandParam[1])
+		ExploreRepo(commandParams[1])
 	case "install":
-		InstallRepo(commandParam[1])
+		InstallRepo(commandParams[1])
 	case "clone":
-		CloneSingle(commandParam[1])
+		CloneSingle(commandParams[1])
 	case "clone-file":
-		CloneSingle(commandParam[1])
+		CloneSingle(commandParams[1])
 	case "cache-clone":
-		CacheCloneRepo(commandParam[1])
+		CacheCloneRepo(commandParams[1])
 	default:
-		invalidCommand(commandParam[0])
+		invalidCommand(commandParams[0])
 	}
 }
 
@@ -161,6 +161,10 @@ func InstallRepo(resourceUrl string) {
 	}
 
 	ExecuteCommands(commandsToRun)
+}
+
+func helpCommand() {
+	ExecuteCommands([]string{"git"})
 }
 
 func invalidCommand(command string) {
