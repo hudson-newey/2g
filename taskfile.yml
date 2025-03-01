@@ -1,0 +1,19 @@
+version: '3'
+
+vars:
+  OUT_DIR: "build"
+
+tasks:
+  build:
+    cmds:
+      - mkdir -p {{.OUT_DIR}}
+      - go build -o {{.OUT_DIR}}/2g ./src/main.go
+      - go build -o {{.OUT_DIR}}/2g-daemon ./daemon/main.go
+
+  clean:
+    cmds:
+      - rm -rf {{.OUT_DIR}}
+
+  docs:
+    cmds:
+      - pandoc --standalone --to man ./README.md -o ./2g.1
