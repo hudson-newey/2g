@@ -2,8 +2,8 @@
 
 ## Description
 
-A custom git wrapper that extends Git with some custom commands that I find
-useful.
+A custom git wrapper that extends Git to improve performance and provide custom
+commands.
 
 Any commands that are not a custom command is automatically passed to Git.
 Git should have full functionality (including using vim to edit commit message).
