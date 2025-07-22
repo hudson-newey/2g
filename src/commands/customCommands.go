@@ -3,46 +3,23 @@ package commands
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/hudson-newey/2g/shared/config"
 )
 
 func IsCustomCommand(command []string) bool {
-	switch command[1] {
-	case "explore", "install", "clone-file", "cache-clone":
-		return true
-	}
-
-	// I have implemented a clone patch so that you can clone a single file
-	// from a repository without downloading the whole repository
-	// therefore, we have to conditionally use the custom clone command
-	// if we are cloning a file instead of a repository
-	if command[1] == "clone" {
-		repositoryPath := strings.Split(command[2], ".git")[1]
-		pathSplit := strings.Split(repositoryPath, "/")
-		return len(pathSplit) > 1
-	}
-
-	return false
+	customCommands := []string{"install", "clone"}
+	return slices.Contains(customCommands, command[1])
 }
 
-func ExecuteCustomCommand(command string) {
-	commandParams := strings.Split(command, " ")
-
-	switch commandParams[0] {
-	case "explore":
-		ExploreRepo(commandParams[1])
+func ExecuteCustomCommand(params []string) {
+	switch params[0] {
 	case "install":
-		InstallRepo(commandParams[1])
+		InstallRepo(params[1])
 	case "clone":
-		CloneSingle(commandParams[1])
-	case "clone-file":
-		CloneSingle(commandParams[1])
-	case "cache-clone":
-		CacheCloneRepo(commandParams[1])
-	default:
-		invalidCommand(commandParams[0])
+		CacheCloneRepo(params[1])
 	}
 }
 
@@ -122,24 +99,6 @@ func CloneSingle(resourceUrl string) {
 		"git clone --depth 1 " + repositoryUrl + " " + tempCloneDir,
 		"cp -r " + tempCloneDir + "/" + pathUrl + " .",
 		"rm -rf " + tempCloneDir,
-	}
-
-	ExecuteCommands(commandsToRun)
-}
-
-func ExploreRepo(resourceUrl string) {
-	if resourceUrl == "" {
-		fmt.Println("Please provide a git URL to explore")
-		os.Exit(1)
-	}
-
-	tempDir := "/tmp/2g"
-
-	commandsToRun := []string{
-		"mkdir " + tempDir,
-		"git clone --depth 1 --single-branch --branch=main " + resourceUrl + " " + tempDir,
-		"yazi " + tempDir,
-		"rm -rf " + tempDir,
 	}
 
 	ExecuteCommands(commandsToRun)

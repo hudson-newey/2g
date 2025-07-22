@@ -8,35 +8,30 @@ useful.
 Any commands that are not a custom command is automatically passed to Git.
 Git should have full functionality (including using vim to edit commit message).
 
+## Cache Cloning
+
+When cloning a repository, its contents is automatically cached, meaning that if
+you clone the same repository again, we can simply update the locally cached
+version instead of re-downloading the entire repository again.
+
+## Lazy Commit History
+
+In large projects, most of the time is spent downloading commit history rather
+than files.
+
+To fix this, 2g doesn't download commit history on the initial clone.
+
+Instead, the repository will be bare cloned, and the git history will be synced
+in the background by a daemon.
+This means that you can clone a repository, make some changes, and (hopefully)
+by the time you are ready to push, the 2g daemon will have finished generating
+the commit history.
+
+This is similar to how [sapling-scm](https://sapling-scm.com) lazily generates
+its commit graph.
+
 ## Custom Commands
 
-- `2g explore <repo.git>`
-    Allows you to explore a Git repo without polluting your directories.
-
-- `2g install <repo.git>`
-    Clones a repository in `~/.local/bin` and adds the repository to your `PATH`
-    environment variable.
-    Note: You will have to reload your shell to use any programs/scripts that
-    were installed.
-
-- `2g clone-file <repo.git>/<file_path>`
-    Similar to the patched clone command, using `clone-file` allows you to clone
-    a single file from a git repository. Without any Git history attached.
-
-- `2g cache-clone <repo.git>`
-    A more optimized version of `git clone` that will attempt to use a local
-    cache of the repository and update it instead of cloning an entire repo
-    from scratch.
-    Additionally, it will fetch git history in the background, meaning that you
-    will have access to all the repositories code, and (hopefully) by the time
-    that you push, all the git history will have been fetched.
-
-## Patched Commands
-
-- `2g clone <repo.git>/[file_path]`
-    By adding a file path to a clone command, you are able to clone a single
-    file from a git repository.
-    Warning: This file will not have any Git history attached to it because it
-    was not cloned as part of a repository.
-    Example: Clone the CUDA .gitignore file into your repository you would
-    run `2g clone https://github.com/github/gitignore/blob/main/CUDA.gitignore`
+| Command              | Description                                                                                                                                                                              |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `install <repo.git>` | Clones a repository in ~/.local/bin and adds the repository to your PATH environment variable. Note: You will have to reload your shell to use any programs/scripts that were installed. |

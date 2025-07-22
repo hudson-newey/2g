@@ -3,6 +3,8 @@ version: "3"
 
 vars:
   OUT_DIR: "build"
+  ENTRY_POINT: "./src/main.go"
+  DAEMON_ENTRY_POINT: "./daemon/main.go"
   DOC_INPUT: "README.md"
 
 tasks:
@@ -10,16 +12,16 @@ tasks:
     desc: Builds 2g for all target systems and generates documentation
     cmds:
       - mkdir -p {{.OUT_DIR}}
-      - go build -o {{.OUT_DIR}}/2g ./src/main.go
-      - go build -o {{.OUT_DIR}}/2g-daemon ./daemon/main.go
+      - go build -o {{.OUT_DIR}}/2g {{.ENTRY_POINT}}
+      - go build -o {{.OUT_DIR}}/2g-daemon {{.DAEMON_ENTRY_POINT}}
       - pandoc --standalone --to man {{.DOC_INPUT}} -o ./{{.OUT_DIR}}/2g.1
 
   build-program:
     desc: Builds 2g for the current system
     cmds:
       - mkdir -p {{.OUT_DIR}}
-      - go build -o {{.OUT_DIR}}/2g ./src/main.go
-      - go build -o {{.OUT_DIR}}/2g-daemon ./daemon/main.go
+      - go build -o {{.OUT_DIR}}/2g {{.ENTRY_POINT}}
+      - go build -o {{.OUT_DIR}}/2g-daemon {{.DAEMON_ENTRY_POINT}}
 
   install:
     desc: Installs artifacts to the system (must be run as root)

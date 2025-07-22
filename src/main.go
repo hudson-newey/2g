@@ -13,13 +13,13 @@ func main() {
 		return
 	}
 
-	args := strings.Join(os.Args[1:], " ")
-
 	if commands.IsCustomCommand(os.Args) {
-		commands.ExecuteCustomCommand(args)
+		commands.ExecuteCustomCommand(os.Args)
 		return
 	}
 
-	gitCommand := "git " + args
+	concatenatedArgs := strings.Join(os.Args[1:], " ")
+	gitCommand := "git " + concatenatedArgs
+
 	commands.Execute(gitCommand)
 }
